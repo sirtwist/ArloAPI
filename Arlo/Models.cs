@@ -12,12 +12,21 @@ namespace Arlo
 
     using Newtonsoft.Json;
 
-    public partial class LoginResponse
+    public partial class ResultResponse
     {
         [JsonProperty("success")]
         public bool Success { get; set; }
     }
 
+    public partial class VideoResponse
+    {
+        [JsonProperty("data")]
+        public List<ArloVideo> Videos { get; set; }
+
+        [JsonProperty("success")]
+        public bool Success { get; set; }
+
+    }
 
     public partial class LoginSuccess
     {
@@ -28,7 +37,7 @@ namespace Arlo
         public bool Success { get; set; }
     }
 
-    public partial class LoginFailure
+    public partial class ResultFailure
     {
         [JsonProperty("data")]
         public LoginError Data { get; set; }
@@ -96,14 +105,14 @@ namespace Arlo
         public static LoginSuccess FromJson(string json) => JsonConvert.DeserializeObject<LoginSuccess>(json, Converter.Settings);
     }
 
-    public partial class LoginFailure
+    public partial class ResultFailure
     {
-        public static LoginFailure FromJson(string json) => JsonConvert.DeserializeObject<LoginFailure>(json, Converter.Settings);
+        public static ResultFailure FromJson(string json) => JsonConvert.DeserializeObject<ResultFailure>(json, Converter.Settings);
     }
 
-    public partial class LoginResponse
+    public partial class ResultResponse
     {
-        public static LoginResponse FromJson(string json) => JsonConvert.DeserializeObject<LoginResponse>(json, Converter.Settings);
+        public static ResultResponse FromJson(string json) => JsonConvert.DeserializeObject<ResultResponse>(json, Converter.Settings);
     }
 
     public static class Serialize

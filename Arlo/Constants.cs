@@ -32,46 +32,19 @@ namespace Arlo
         public bool schedule { get; set; }
     }
 
+    public class MessageBody
+    {
+        public string action { get; set; }
+        public string from { get; set; }
+        public Dictionary<string,string> properties { get; set; }
+        public bool publishResponse { get; set; }
+        public string resource { get; set; }
+        public string to { get; set; }
+    }
 
-//    RESOURCES = {
-//    'base_station': 'base_station',
-//    'modes': 'modes',
-//    'schedule': 'schedule',
-//    'rules': 'rules',
-//    'cameras': 'cameras',
-//}
+    public class ExtendedBody: MessageBody
+    {
+        public string transId { get; set; }
+    }
 
-//# define body used when executing an action
-//ACTION_BODY = {
-//    'action': None,
-//    'from': None,
-//    'properties': None,
-//    'publishResponse': None,
-//    'resource': None,
-//    'to': None
-//    }
-
-//#define body used for live_streaming
-//    STREAMING_BODY = {
-//    'action': 'set',
-//    'from': None,
-//    'properties': {'activityState': 'startPositionStream'},
-//    'publishResponse': 'true',
-//    'resource': None,
-//    'to': None,
-//    'transId': "",
-//}
-
-
-//# define body used for live_streaming
-//SNAPSHOTS_BODY = {
-//    'action': 'set',
-//    'from': None,
-//    'properties': {'activityState': 'fullFrameSnapshot'},
-//    'publishResponse': 'true',
-//    'resource': None,
-//    'to': None,
-//    'transId': ""
-//}
-//    }
 }

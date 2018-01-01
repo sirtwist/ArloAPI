@@ -50,7 +50,7 @@ namespace Arlo
             CleanupHeaders();
             var data = await Query(Constants.LOGIN_ENDPOINT, HttpMethod.Post);
 
-            var results = LoginResponse.FromJson(data);
+            var results = ResultResponse.FromJson(data);
             if (results.Success)
             {
                 var details = LoginSuccess.FromJson(data);
@@ -58,7 +58,7 @@ namespace Arlo
                 return null;
             } else
             {
-                var details = LoginFailure.FromJson(data);
+                var details = ResultFailure.FromJson(data);
                 return details.Data.Message;
             }
         }
@@ -101,7 +101,7 @@ namespace Arlo
             Dictionary<string, string> instanceParameters = new Dictionary<string,string>(parameters);
             if (extra_params != null && extra_params.Count > 0)
             {
-                extra_headers.ToList().ForEach(x => instanceParameters[x.Key] = x.Value);
+                extra_params.ToList().ForEach(x => instanceParameters[x.Key] = x.Value);
             }
             switch (method.Method)
             {
@@ -114,65 +114,32 @@ namespace Arlo
                     request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                     break;
             }
-            var response = await client.SendAsync(request);
-
-            return await response.Content.ReadAsStringAsync();
+            string resultJSON = null;
+            int attempt = 1;
+            Exception lastException = null;
+            bool success = false;
+            while ((attempt <= retry) && (!success))
+            {
+                try
+                {
+                    lastException = null;
+                    var response = await client.SendAsync(request);
+                    resultJSON = await response.Content.ReadAsStringAsync();
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    attempt++;
+                    success = false;
+                }
+            }
+            if (lastException != null)
+            {
+                throw lastException;
+            }
+            return resultJSON; 
         }
-        //Return a JSON object or raw session.
-        //:param url:  Arlo API URL
-        //:param method: Specify the method GET, POST or PUT.Default is GET.
-        //:param extra_params: Dictionary to be appended on request.body
-        //:param extra_headers: Dictionary to be apppended on request.headers
-        //:param retry: Attempts to retry a query.Default is 3.
-        //:param raw: Boolean if query() will return request object instead JSON.
-        //:param stream: Boolean if query() will return a stream object.
-
-        //response = None
-        //loop = 0
-
-        //# always make sure the headers and params are clean
-        //self.cleanup_headers()
-
-        //while loop <= retry:
-
-        //    # override request.body or request.headers dictionary
-        //    if extra_params:
-        //        params = self.__params
-        //        params.update(extra_params)
-        //    else:
-        //        params = self.__params
-        //    _LOGGER.debug("Params: %s", params)
-
-        //    if extra_headers:
-        //        headers = self.__headers
-        //        headers.update(extra_headers)
-        //    else:
-        //        headers = self.__headers
-        //    _LOGGER.debug("Headers: %s", headers)
-
-        //    _LOGGER.debug("Querying %s on attempt: %s/%s", url, loop, retry)
-        //    loop += 1
-
-        //    # define connection method
-        //    req = None
-
-        //    if method == 'GET':
-        //        req = self.session.get(url, headers=headers, stream=stream)
-        //    elif method == 'PUT':
-        //        req = self.session.put(url, json=params, headers=headers)
-        //    elif method == 'POST':
-        //        req = self.session.post(url, json=params, headers=headers)
-
-        //    if req and(req.status_code == 200):
-        //        if raw:
-        //            _LOGGER.debug("Required raw object.")
-        //            response = req
-        //        else:
-        //            response = req.json()
-
-        //        # leave if everything worked fine
-        //        break
-
-        //return response
+ 
     }
 }
